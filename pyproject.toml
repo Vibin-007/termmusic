@@ -16,7 +16,7 @@ dependencies = [
 ]
 
 [project.scripts]
-termtune = "termtune.app:main"
+termtune = "termtune.__main__:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
