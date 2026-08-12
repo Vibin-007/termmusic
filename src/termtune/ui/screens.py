@@ -1,7 +1,8 @@
-"""Main screen and UI layout for TermTune (Instant Playlist Playback & Complete Engine)."""
+"""Main screen and UI layout for TermTune (IPC Server & Zen Mode Integration)."""
 
 import asyncio
 import logging
+from typing import Any
 from textual.app import ComposeResult
 from textual.binding import Binding
 from textual.containers import Container, Vertical
@@ -9,10 +10,12 @@ from textual.events import Resize
 from textual.screen import Screen
 from textual.widgets import Input, Label
 
+from termtune.ipc import IPCServer
 from termtune.models.track import Track
 from termtune.player.controller import PlayerController
 from termtune.player.mpv import PlaybackState
 from termtune.ui.modals import PlaylistSelectModal, TrackActionModal
+from termtune.ui.zen import ZenScreen
 from termtune.ui.widgets import (
     ControlsWidget,
     NowPlayingWidget,
@@ -22,6 +25,7 @@ from termtune.ui.widgets import (
 )
 from termtune.ui.widgets.results import KeyboardListView
 from termtune.utils.errors import TermTuneError
+from termtune.utils.formatting import format_time
 
 logger = logging.getLogger(__name__)
 
@@ -41,6 +45,7 @@ class MainScreen(Screen):
         Binding("m", "toggle_mute", "Mute", show=False),
         Binding("r", "toggle_repeat", "Repeat", show=False),
         Binding("z", "toggle_shuffle", "Shuffle", show=False),
+        Binding("shift+z", "open_zen", "Zen Mode", show=False),
         Binding("left", "seek_backward", "Seek Back", show=False),
         Binding("right", "seek_forward", "Seek Forward", show=False),
         Binding("a", "add_to_queue", "Add Queue", show=False),
@@ -54,6 +59,7 @@ class MainScreen(Screen):
     def __init__(self, controller: PlayerController, **kwargs):
         super().__init__(**kwargs)
         self.controller = controller
+        self.ipc_server = IPCServer(self._handle_ipc_command)
 
     def compose(self) -> ComposeResult:
         # Top Header Banner
@@ -83,8 +89,73 @@ class MainScreen(Screen):
         self.controller.set_on_track_change(self._on_track_changed)
         self.controller.set_on_error(self._on_controller_error)
 
+        # Start IPC socket server in background
+        asyncio.create_task(self.ipc_server.start())
+
         # Initial UI refresh
         self.refresh_ui()
+
+    async def _handle_ipc_command(self, req: dict[str, Any]) -> dict[str, Any]:
+        """Handle incoming command pipeline requests from termtune CLI binary."""
+        action = req.get("action")
+        logger.info(f"IPC Request received: {action}")
+
+        if action == "play":
+            query = req.get("query", "").strip()
+            if not query:
+                await self.controller.resume()
+                return {"status": "ok", "message": "Resumed playback"}
+            
+            try:
+                tracks = await self.controller.provider.search(query)
+                if tracks:
+                    top = tracks[0]
+                    await self.controller.play_track(top, add_to_queue=True)
+                    self.refresh_ui()
+                    return {"status": "ok", "message": f"Playing '{top.title}' by {top.artist}"}
+                return {"status": "error", "message": f"No tracks found for '{query}'"}
+            except Exception as e:
+                return {"status": "error", "message": str(e)}
+
+        elif action in ("pause", "stop"):
+            await self.controller.pause()
+            self.refresh_ui()
+            return {"status": "ok", "message": "Paused playback"}
+
+        elif action in ("resume", "toggle"):
+            st = await self.controller.toggle_play_pause()
+            self.refresh_ui()
+            return {"status": "ok", "message": f"State: {st.name}"}
+
+        elif action == "next":
+            await self.controller.next()
+            self.refresh_ui()
+            cur = self.controller.current_track
+            t_name = cur.title if cur else "None"
+            return {"status": "ok", "message": f"Playing next track: {t_name}"}
+
+        elif action in ("prev", "previous"):
+            await self.controller.previous()
+            self.refresh_ui()
+            cur = self.controller.current_track
+            t_name = cur.title if cur else "None"
+            return {"status": "ok", "message": f"Playing previous track: {t_name}"}
+
+        elif action == "status":
+            cur = self.controller.current_track
+            mpv = self.controller.mpv
+            if cur:
+                return {
+                    "status": "ok",
+                    "state": mpv.state.name,
+                    "title": cur.title,
+                    "artist": cur.artist,
+                    "position": format_time(mpv.position),
+                    "duration": format_time(mpv.duration),
+                }
+            return {"status": "ok", "state": "STOPPED", "message": "No track playing"}
+
+        return {"status": "error", "message": f"Unknown action '{action}'"}
 
     def on_resize(self, event: Resize) -> None:
         """Handle screen resize for responsive layouts."""
@@ -279,6 +350,12 @@ class MainScreen(Screen):
         queue_widget.toggle_filter()
 
     # Global Action Binds
+    def action_open_zen(self) -> None:
+        """Open Zen Mode screensaver."""
+        if self._is_input_focused():
+            return
+        self.app.push_screen(ZenScreen(self.controller))
+
     def action_open_playlists(self) -> None:
         """Open playlist selector modal to load playlist into queue and play immediately."""
         if self._is_input_focused():
@@ -453,5 +530,6 @@ class MainScreen(Screen):
     async def action_quit_app(self) -> None:
         if self._is_input_focused():
             return
+        await self.ipc_server.stop()
         await self.controller.shutdown()
         self.app.exit()

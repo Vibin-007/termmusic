@@ -10,6 +10,8 @@
 
 ## ✨ Features
 
+- ⚡ **CLI Command Pipeline**: Control playback directly from any terminal prompt (`termtune play "song"`, `termtune next`, `termtune pause`, `termtune status`).
+- 🎮 **"Zen Mode" Screensaver (`Shift+Z`)**: Full-screen minimal animated ASCII spinning vinyl record with floating track metadata.
 - ⚡ **Zero-Latency Playback**: Direct stream extraction via `yt-dlp` with automatic background pre-fetching for instant track transitions.
 - 📁 **Playlist Manager**: Create, load, edit, and delete saved playlists stored under `~/.termtune/playlists/`. Loading a playlist starts playback immediately.
 - 🛡️ **Strict Duplicate Prevention**: Blocks duplicate tracks from polluting your queue with real-time warning notifications.
@@ -18,6 +20,28 @@
 - ⏱️ **Queue Duration Header**: Real-time calculated queue statistics displaying total tracks and combined playback duration.
 - 🔀 **Smart Queue Engine**: Instant track removal (`d`/`Delete`), live reordering (`Alt+Up`/`Alt+Down`), Play Next insertion (`Shift+A`), and inline queue filtering (`/`).
 - ⚪ **Monochrome High-Contrast Theme**: Pure dark aesthetic with clean white scrollbars and dynamic micro-animations.
+
+---
+
+## 💻 CLI Command Pipeline
+
+Control music from any shell tab or script without opening the full TUI:
+
+```bash
+# Search and play a track directly from bash
+termtune play "lo-fi hip hop chill beats"
+
+# Skip to next or previous track
+termtune next
+termtune prev
+
+# Toggle pause / resume
+termtune pause
+termtune resume
+
+# Print current track status and progress
+termtune status
+```
 
 ---
 
@@ -69,6 +93,7 @@ termtune
 
 | Key | Action |
 | :--- | :--- |
+| <kbd>Shift</kbd> + <kbd>Z</kbd> | Toggle **"Zen Mode" Animated ASCII Screensaver** |
 | <kbd>S</kbd> | Focus Search Input |
 | <kbd>Space</kbd> | Toggle Play / Pause |
 | <kbd>N</kbd> | Next Track in Queue |
@@ -86,7 +111,7 @@ termtune
 | <kbd>Z</kbd> | Toggle Shuffle Mode |
 | <kbd>R</kbd> | Cycle Repeat Mode (`OFF` -> `ALL` -> `TRACK`) |
 | <kbd>←</kbd> / <kbd>→</kbd> | Seek 10s Backward / Forward |
-| <kbd>Esc</kbd> | Unfocus Search Input / Close Modal |
+| <kbd>Esc</kbd> | Unfocus Search Input / Close Modal / Exit Zen |
 | <kbd>Q</kbd> | Quit TermTune |
 
 ---
@@ -97,12 +122,13 @@ termtune
 src/termtune/
 ├── app.py                # Main Textual App entry point
 ├── config/               # Settings & persistent TOML configuration
+├── ipc.py                # Inter-Process Communication UNIX socket server/client
 ├── models/               # Data models (Track, StreamInfo)
 ├── player/               # MPV adapter & PlayerController engine
 ├── playlist/             # PlaylistManager handling disk JSON playlists
 ├── providers/            # Music providers (yt-dlp YouTube search & resolution)
 ├── queue/                # QueueManager with deduplication, persistence & shuffle history
-├── ui/                   # Textual screens, action modals, and custom widgets
+├── ui/                   # Textual screens, action modals, widgets, and Zen Mode screensaver
 └── utils/                # Formatting helpers and custom exception types
 ```
 

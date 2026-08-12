@@ -351,3 +351,57 @@ TrackActionModal, CreatePlaylistModal, PlaylistSelectModal {
     scrollbar-color: #ffffff;
     scrollbar-background: #09090b;
 }
+
+/* Zen Mode Screensaver */
+ZenScreen {
+    align: center middle;
+    background: #000000;
+}
+
+#zen-container {
+    width: 60;
+    height: auto;
+    content-align: center middle;
+    align: center middle;
+}
+
+#zen-header {
+    text-style: bold;
+    color: #ffffff;
+    content-align: center middle;
+    margin-bottom: 1;
+}
+
+#zen-vinyl {
+    color: #ffffff;
+    content-align: center middle;
+    height: 10;
+}
+
+#zen-title {
+    content-align: center middle;
+    text-style: bold;
+    color: #ffffff;
+    margin-top: 1;
+}
+
+#zen-artist {
+    content-align: center middle;
+    color: #a1a1aa;
+    margin-bottom: 1;
+}
+
+#zen-progress {
+    content-align: center middle;
+    margin-bottom: 1;
+}
+
+#zen-status-bar {
+    content-align: center middle;
+    margin-bottom: 1;
+}
+
+#zen-footer {
+    content-align: center middle;
+    margin-top: 1;
+}
