@@ -63,7 +63,10 @@ class ZenScreen(Screen):
 
     BINDINGS = [
         Binding("escape", "exit_zen", "Exit Zen Mode"),
-        Binding("shift+z,z", "exit_zen", "Exit Zen Mode"),
+        Binding("Z", "exit_zen", "Exit Zen Mode"),
+        Binding("z", "exit_zen", "Exit Zen Mode"),
+        Binding("shift+z", "exit_zen", "Exit Zen Mode"),
+        Binding("ctrl+z", "exit_zen", "Exit Zen Mode"),
         Binding("space", "toggle_play_pause", "Play/Pause"),
         Binding("n", "next_track", "Next Track"),
         Binding("b", "prev_track", "Previous Track"),
