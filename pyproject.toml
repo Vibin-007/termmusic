@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "termtune"
+version = "0.1.0"
+description = "A polished, cross-platform terminal online music player"
+readme = "README.md"
+authors = [{ name = "TermTune Team" }]
+license = { text = "MIT" }
+requires-python = ">=3.11"
+dependencies = [
+    "textual>=0.50.0",
+    "yt-dlp>=2024.1.1",
+]
+
+[project.scripts]
+termtune = "termtune.app:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
