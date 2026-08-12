@@ -10,15 +10,20 @@
 
 ## ⚡ Quick 1-Line Installation for You & Friends
 
-Anyone can install and run `termtune` globally from anywhere in their terminal:
-
-### Option A: Using `pip` or `pipx` (Recommended for Friends)
+### Option 1: Direct `pip` Install (Fastest)
+Run this command in any terminal:
 ```bash
-pip install git+https://github.com/Vibin-007/termmusic.git
+pip install --break-system-packages git+https://github.com/Vibin-007/termmusic.git
 ```
 *(Requires `mpv` installed on system: `sudo apt install mpv` on Linux or `brew install mpv` on macOS)*
 
-### Option B: Local Repository Installation
+### Option 2: Using `pipx` (Recommended Official Standard)
+```bash
+sudo apt install -y pipx
+pipx install git+https://github.com/Vibin-007/termmusic.git
+```
+
+### Option 3: Local Clone & Setup
 ```bash
 git clone https://github.com/Vibin-007/termmusic.git
 cd termmusic
@@ -26,7 +31,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -e .
 
-# Symlink to ~/.local/bin to run `termtune` from anywhere without activating .venv
+# Symlink to ~/.local/bin to run `termtune` from anywhere
 mkdir -p ~/.local/bin
 ln -sf $(pwd)/.venv/bin/termtune ~/.local/bin/termtune
 ```
