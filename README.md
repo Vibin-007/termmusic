@@ -8,32 +8,38 @@
 
 ---
 
-## ⚡ Quick 1-Line Installation for You & Friends
+## ⚡ 1-Line Automated Install (For any Laptop / PC)
 
-### Option 1: Direct `pip` Install (Fastest)
-Run this command in any terminal:
+Run this single command in any Linux or macOS terminal:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Vibin-007/termmusic/main/install.sh | bash
+```
+
+This script automatically handles installing `mpv` dependencies, installs TermTune, configures PATH, and sets up the global `termtune` command!
+
+---
+
+### Alternative Manual Installation Options
+
+#### Option A: Direct `pip` Install
 ```bash
 pip install --break-system-packages git+https://github.com/Vibin-007/termmusic.git
 ```
-*(Requires `mpv` installed on system: `sudo apt install mpv` on Linux or `brew install mpv` on macOS)*
 
-### Option 2: Using `pipx` (Recommended Official Standard)
+#### Option B: Using `pipx`
 ```bash
 sudo apt install -y pipx
 pipx install git+https://github.com/Vibin-007/termmusic.git
 ```
 
-### Option 3: Local Clone & Setup
+#### Option C: Local Clone & Setup
 ```bash
 git clone https://github.com/Vibin-007/termmusic.git
 cd termmusic
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e .
-
-# Symlink to ~/.local/bin to run `termtune` from anywhere
-mkdir -p ~/.local/bin
-ln -sf $(pwd)/.venv/bin/termtune ~/.local/bin/termtune
 ```
 
 Once installed, simply type **`termtune`** in any terminal prompt!
